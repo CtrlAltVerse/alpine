@@ -1,0 +1,22 @@
+{
+   "name": "@ctrlaltvers/alpine",
+   "version": "1.0.0",
+   "description": "An Alpine plugin with many extra features.",
+   "homepage": "https://plugins.altvers.net/alpine",
+   "repository": {
+      "type": "git",
+      "url": "https://github.com/CtrlAltVerse/alpine",
+      "directory": "src"
+   },
+   "author": "CtrlAltVerse",
+   "license": "MIT",
+   "main": "dist/module.cjs.js",
+   "module": "dist/module.esm.js",
+   "scripts": {
+      "build": "node ./build.js",
+      "watch": "node ./build.js --watch"
+   },
+   "devDependencies": {
+      "esbuild": "~0.16.17"
+   }
+}
