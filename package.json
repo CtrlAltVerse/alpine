@@ -1,31 +1,14 @@
 {
-   "name": "@ctrlaltvers/alpine",
-   "author": "CtrlAltVerse (https://ctrl.altvers.net)",
-   "description": "An Alpine plugin for reactive websites.",
+   "name": "@ctrlaltvers/alpine-scripts",
+   "description": "Scripts for the package.",
    "version": "1.0.0",
    "scripts": {
-      "build": "node ./build.js",
-      "watch": "node ./build.js --watch"
+      "build": "node ./scripts/build.js",
+      "watch": "npm run build -- --watch",
+      "release": "node ./scripts/release.js"
    },
    "devDependencies": {
       "@types/alpinejs": "^3.13.11",
       "esbuild": "~0.16.17"
-   },
-   "homepage": "https://plugins.altvers.net/alpine",
-   "keywords": [
-      "alpinejs",
-      "plugin"
-   ],
-   "repository": {
-      "type": "git",
-      "url": "https://github.com/CtrlAltVerse/alpine"
-   },
-   "bugs": {
-      "url": "https://github.com/CtrlAltVerse/alpine/issues"
-   },
-   "license": "MIT",
-   "unpkg": "dist/cdn.min.js",
-   "types": "dist/types.d.ts",
-   "main": "dist/module.cjs.js",
-   "module": "dist/module.esm.js"
+   }
 }

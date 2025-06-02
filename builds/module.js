@@ -1,4 +1,4 @@
-import cav, { showToast, cookieStorage } from '../src/index.js'
+import cav, { showToast, cookieStorage } from '../package/src/index.js'
 
 export default cav
 

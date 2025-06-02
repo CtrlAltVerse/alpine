@@ -127,8 +127,10 @@ async function doFetch(el, method, url, body = {}) {
    document.body.classList.add('cav-body-loading')
    el.classList.add('cav-el-loading')
 
+   method = method === 'del' ? 'DELETE' : method.toUpperCase()
+
    const options = {
-      method: method === 'del' ? 'DELETE' : method.toUpperCase(),
+      method,
       headers: {
          'Content-Type': 'application/json',
       },
@@ -170,13 +172,13 @@ async function doFetch(el, method, url, body = {}) {
 
 const doActions = (actions, success = true, force = true) => {
    if (Array.isArray(actions)) {
-      if (!force && empty(actions[0].action)) {
+      if (!force && empty(actions[0]?.action)) {
          return
       }
 
       actions.forEach((action) => doAction(action, success))
    } else {
-      if (!force && empty(actions.action)) {
+      if (!force && empty(actions?.action)) {
          return
       }
 
@@ -424,13 +426,13 @@ const doAction = (todo, success) => {
    }
 
    // CHECKS action
-   if (empty(actions[action])) {
+   if (empty(actions?.[action])) {
       throw new Error(`${action} is not a valid action`)
    }
 
    // CHECKS required proprieties
-   if (!empty(actions[action].req)) {
-      if (actions[action].req.some((check) => empty(todo[check]))) {
+   if (!empty(actions[action]?.req)) {
+      if (actions[action].req.some((check) => empty(todo?.[check]))) {
          throw new Error(
             `"${action}" needs ${actions[action].req.join(' and ')}`
          )
@@ -438,8 +440,8 @@ const doAction = (todo, success) => {
    }
 
    // CHECKS optional proprieties
-   if (!empty(actions[action].opt)) {
-      if (actions[action].opt.every((check) => empty(todo[check]))) {
+   if (!empty(actions[action]?.opt)) {
+      if (actions[action].opt.every((check) => empty(todo?.[check]))) {
          throw new Error(
             `"${action}" needs ${actions[action].opt.join(' or ')}`
          )
@@ -447,7 +449,7 @@ const doAction = (todo, success) => {
    }
 
    // DO direct actions
-   if (!empty(actions[action].one)) {
+   if (!empty(actions[action]?.one)) {
       return actions[action].cb()
    }
 

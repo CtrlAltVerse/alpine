@@ -42,7 +42,7 @@
 
    <button x-on:click="console.log($do({action:'reload'}))">Reload the page</button>
 
-   <button x-on:click="console.log(await $rest.get('https://jsonplaceholder.typicode.com/todos'))">do
+   <button x-on:click="console.log(await $rest.get('https://jsonplaceholder.typicode.com/todos', {todo: 1}))">do
       request</button>
 
    <button
