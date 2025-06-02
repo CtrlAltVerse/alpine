@@ -9,10 +9,10 @@ slightly inspired by HTMX and jQuery.
 
 ```html
 <!-- CAV Alpine Plugin -->
-<script defer src="https://cdn.jsdelivr.net/npm/@ctrtaltvers/alpine@1.x.x/dist/cdn.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@ctrlaltvers/alpine@1/dist/cdn.min.js"></script>
 
 <!-- Alpine Core -->
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
 ```
 
 ### Via NPM
