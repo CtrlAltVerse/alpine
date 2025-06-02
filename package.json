@@ -1,7 +1,7 @@
 {
    "name": "@ctrlaltvers/alpine",
    "author": "CtrlAltVerse (https://ctrl.altvers.net)",
-   "description": "An Alpine plugin with many extra features.",
+   "description": "An Alpine plugin for reactive websites.",
    "version": "1.0.0",
    "scripts": {
       "build": "node ./build.js",

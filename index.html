@@ -133,6 +133,10 @@
 
    <button x-on:click="newP">new p</button>
 
+   <template x-for="n in $range(7)">
+      <span x-text="n"></span>
+   </template>
+
    <button x-on:click="console.log($do({action:'scroll',target:'#targetInput'}))">Scroll</button>
 
    <script>
