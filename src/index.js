@@ -1,4 +1,10 @@
-import { empty, hasValue } from './utils'
+import {
+   empty,
+   hasValue,
+   isNumber,
+   inNatoAlphabet,
+   natoAlphabet,
+} from './utils'
 
 export default function (Alpine) {
    Alpine.magic('do', (_el) => {
@@ -7,28 +13,17 @@ export default function (Alpine) {
             return doAction({ action, target, content, extra })
          }
 
-         doActions(action)
+         return doActions(action)
       }
    })
 
    Alpine.magic('rest', (el) => {
-      return {
-         get: (path, body = {}) => {
-            return doFetch(el, 'GET', path, body)
-         },
-         post: (path, body = {}) => {
-            return doFetch(el, 'POST', path, body)
-         },
-         put: (path, body = {}) => {
-            return doFetch(el, 'PUT', path, body)
-         },
-         patch: (path, body = {}) => {
-            return doFetch(el, 'PATCH', path, body)
-         },
-         del: (path, body = {}) => {
-            return doFetch(el, 'DELETE', path, body)
-         },
-      }
+      return Object.fromEntries(
+         ['get', 'post', 'put', 'patch', 'del', 'delete'].map((method) => [
+            method,
+            (path, body = {}) => doFetch(el, method, path, body),
+         ])
+      )
    })
 
    Alpine.magic('width', () => {
@@ -40,7 +35,7 @@ export default function (Alpine) {
    })
 
    Alpine.magic('get', () => {
-      const methods = {
+      return {
          cookie: (key) => {
             return JSON.parse(cookieStorage.getItem(key))
          },
@@ -50,7 +45,7 @@ export default function (Alpine) {
          session: (key) => {
             return JSON.parse(sessionStorage.getItem(key))
          },
-         value: (key) => {
+         val: (key) => {
             let el = document.getElementsByName(key)
             if (el.length) {
                return el[0].value
@@ -65,34 +60,50 @@ export default function (Alpine) {
             }
             return null
          },
-         val: (key) => methods.value(key),
-         lcl: (key) => methods.local(key),
-         ses: (key) => methods.session(key),
-         ck: (key) => methods.cookie(key),
       }
-
-      return methods
    })
 
    Alpine.magic('range', () => {
-      return function (start, stop, step = 1) {
-         if (empty(stop)) {
-            stop = start
-            start = start ? 1 : 0
+      return (stop, start = 1, step = 1) => {
+         if (isNumber(stop)) {
+            return Array.from(
+               { length: (stop - start) / step + 1 },
+               (_, i) => start + i * step
+            )
          }
 
-         const reverse = start > stop
-         if (reverse) {
-            start = stop
-            stop = start
+         const stopIndex = inNatoAlphabet(stop)
+         if (stopIndex !== -1) {
+            const startIndex = inNatoAlphabet(start, 0)
+
+            const words = []
+            for (let i = startIndex; i <= stopIndex; i++) {
+               words.push(natoAlphabet[i])
+            }
+
+            return words
          }
 
-         const range = Array.from(
-            { length: (stop - start) / step + 1 },
-            (_, i) => start + i * step
-         )
+         stop = stop.charCodeAt(0)
 
-         return reverse ? range.reverse() : range
+         if (isNumber(start)) {
+            // UPPERCASEs
+            if (65 <= stop && stop <= 90) {
+               start = 'A'
+            }
+            // LOWERCASEs
+            if (97 <= stop && stop <= 122) {
+               start = 'a'
+            }
+         }
+         start = start.charCodeAt(0)
+
+         const letters = []
+         for (let i = start; i <= stop; i++) {
+            letters.push(String.fromCharCode(i))
+         }
+
+         return letters
       }
    })
 
@@ -117,7 +128,7 @@ async function doFetch(el, method, url, body = {}) {
    el.classList.add('cav-el-loading')
 
    const options = {
-      method,
+      method: method === 'del' ? 'DELETE' : method.toUpperCase(),
       headers: {
          'Content-Type': 'application/json',
       },
@@ -169,13 +180,23 @@ const doActions = (actions, success = true, force = true) => {
          return
       }
 
-      doAction(actions, success)
+      return doAction(actions, success)
    }
 }
 
-const checkAction = (act, _success) => {
-   if ('ignore' === act.action) {
-      return act
+const doAction = (todo, success) => {
+   if ('object' !== typeof todo) {
+      throw new Error('action is not a object')
+   }
+
+   if (!todo.hasOwnProperty('action')) {
+      throw new Error('action is missing')
+   }
+
+   let { action, target, content, extra } = todo
+
+   if ('ignore' === action) {
+      return
    }
 
    const alias = {
@@ -192,294 +213,267 @@ const checkAction = (act, _success) => {
       setAttr: 'setAttribute',
    }
 
-   act.action = alias[act.action] ?? act.action
+   action = alias[action] ?? action
 
-   const required = {
-      addClass: ['target', 'content'],
-      afterbegin: ['target'],
-      afterend: ['target'],
-      beforebegin: ['target'],
-      beforeend: ['target'],
-      clone: ['target', 'content'],
-      cookie: ['target'],
-      copy: [],
-      delay: ['content'],
-      go: ['target'],
-      hide: ['target'],
-      html: ['target'],
-      local: ['target'],
-      method: ['target'],
-      move: ['target', 'content'],
-      open: ['target'],
-      paste: ['target'],
-      reload: [],
-      remove: ['target'],
-      removeAttribute: ['target'],
-      removeClass: ['target', 'content'],
-      scroll: ['target'],
-      session: ['target'],
-      setAttribute: ['target', 'content'],
-      show: ['target'],
-      style: ['target', 'content'],
-      text: ['target'],
-      title: ['content'],
-      toast: ['content'],
-      trigger: ['target', 'content'],
-      value: ['target', 'content'],
-   }
-
-   const optional = {
-      cookie: ['content', 'extra'],
-      copy: ['target', 'content'],
-      local: ['content', 'extra'],
-      session: ['content', 'extra'],
-   }
-
-   if (empty(required[act.action])) {
-      throw new Error(`${act.action} is not a valid action`)
-   }
-
-   required[act.action].forEach((check) => {
-      if (empty(act[check])) {
-         throw new Error(`${check} is needed for the "${act.action}" action`)
-      }
-   })
-
-   if (!empty(optional[act.action])) {
-      if (!optional[act.action].some((check) => !empty(act[check]))) {
-         throw new Error(
-            `${optional[act.action].join(' or ')} is needed for the "${
-               act.action
-            }" action`
-         )
-      }
-   }
-
-   switch (act.action) {
-      case 'cookie':
-      case 'session':
-      case 'local':
-         act.target = act.target.replace(/[^a-zA-Z0-9_-]/g, '')
-         act.content = JSON.stringify(act.content)
-         act.extra = act.extra ?? 60 * 60 * 24 * 7
-         break
-
-      case 'go':
-      case 'open':
-         act.target = new URL(act.target).href
-         break
-
-      case 'toast':
-         if (!empty(act.target)) {
-            act.target = new URL(act.target).href
-         }
-         break
-
-      case 'copy':
-         if (!empty(act.target)) {
-            const el = document.querySelector(act.target)
-            if (el !== null) {
-               if (hasValue(el)) {
-                  act.content = el.value
-               } else {
-                  act.content = el.innerText
+   const actions = {
+      addClass: {
+         req: ['target', 'content'],
+         cb: (el) => el.classList.add(...content.split(' ')),
+      },
+      afterbegin: {
+         req: ['target'],
+         cb: (el) => doInsertAction(el, action, content),
+      },
+      afterend: {
+         req: ['target'],
+         cb: (el) => doInsertAction(el, action, content),
+      },
+      beforebegin: {
+         req: ['target'],
+         cb: (el) => doInsertAction(el, action, content),
+      },
+      beforeend: {
+         req: ['target'],
+         cb: (el) => doInsertAction(el, action, content),
+      },
+      clone: {
+         req: ['target', 'content'],
+         cb: (el) => {
+            const source = document.querySelector(content)
+            if (null !== source) {
+               return el.appendChild(source.cloneNode(true))
+            }
+         },
+      },
+      cookie: {
+         one: true,
+         req: ['target'],
+         opt: ['content', 'extra'],
+         cb: () => doStorageAction(cookieStorage, target, content, extra),
+      },
+      copy: {
+         one: true,
+         opt: ['target', 'content'],
+         cb: () => {
+            if (!empty(target)) {
+               const el = document.querySelector(target)
+               if (el !== null) {
+                  if (hasValue(el)) {
+                     content = el.value
+                  } else {
+                     content = el.innerText
+                  }
                }
             }
-         }
-         break
 
-      case 'paste':
-         const el = document.querySelector(act.target)
-         if (el !== null && empty(act.content)) {
-            if (hasValue(el)) {
-               act.content = 'value'
-            } else {
-               act.content = 'textContent'
+            navigator.clipboard.writeText(content)
+         },
+      },
+      delay: {
+         one: true,
+         req: ['content'],
+         cb: () => setTimeout(() => doActions(content), (extra ?? 5) * 1000),
+      },
+      go: {
+         one: true,
+         req: ['target'],
+         cb: () =>
+            setTimeout(() => location.assign(target), (extra ?? 5) * 1000),
+      },
+      hide: {
+         req: ['target'],
+         cb: (el) => (el.style.display = 'none'),
+      },
+      html: {
+         req: ['target'],
+         opt: ['content', 'extra'],
+         cb: (el) => (el.innerHTML = content),
+      },
+      local: {
+         one: true,
+         req: ['target'],
+         cb: () => doStorageAction(localStorage, target, content, extra),
+      },
+      method: {
+         req: ['target'],
+         cb: (el) => {
+            if ('function' === typeof el[content]) {
+               return el[content]()
             }
-         }
-         break
+         },
+      },
+      move: {
+         one: true,
+         req: ['target', 'content'],
+         cb: () => {
+            const source = document.querySelector(content)
+            const destination = document.querySelector(target)
 
-      default:
-         break
-   }
-
-   return act
-}
-
-const doAction = (todo, success = true) => {
-   if ('object' !== typeof todo) {
-      throw new Error('action is not a object')
-   }
-
-   if (!todo.hasOwnProperty('action')) {
-      throw new Error('action is missing')
-   }
-
-   const { action, target, content, extra } = checkAction(todo, success)
-
-   if ('ignore' === action) {
-      return
-   }
-
-   if ('delay' === action) {
-      setTimeout(() => doActions(content), (extra ?? 5) * 1000)
-      return
-   }
-
-   /**
-    * DIRECT ACTIONS
-    */
-   switch (action) {
-      case 'session':
-      case 'local':
-      case 'cookie':
-         let storage = localStorage
-         if (action === 'session') {
-            storage = sessionStorage
-         }
-         if (action === 'cookie') {
-            storage = cookieStorage
-         }
-
-         if (!empty(extra) && extra <= 0) {
-            return storage.removeItem(target)
-         } else {
-            if (action === 'cookie') {
-               return storage.setItem(target, content, extra)
-            } else {
-               return storage.setItem(target, content)
+            if (null !== source && null === destination) {
+               return destination.appendChild(source)
             }
-         }
+         },
+      },
+      open: {
+         one: true,
+         req: ['target'],
+         cb: () => setTimeout(() => window.open(target), (extra ?? 5) * 1000),
+      },
+      paste: {
+         req: ['target'],
+         cb: (el) => {
+            const el_target = document.querySelector(target)
+            if (el_target !== null && empty(content)) {
+               if (hasValue(el_target)) {
+                  content = 'value'
+               } else {
+                  content = 'textContent'
+               }
+            }
 
-      case 'go':
-         setTimeout(() => location.assign(target), (extra ?? 5) * 1000)
-         return
-
-      case 'open':
-         setTimeout(() => window.open(target), (extra ?? 5) * 1000)
-         return
-
-      case 'reload':
-         setTimeout(() => document.location.reload(), (extra ?? 5) * 1000)
-         return
-
-      case 'title':
-         document.title = content
-         return
-
-      case 'copy':
-         return navigator.clipboard.writeText(content)
-
-      case 'move':
-         const mSource = document.querySelector(content)
-         const mDestination = document.querySelector(target)
-
-         if (null === mSource || null === mDestination) {
-            return
-         }
-
-         return mDestination.appendChild(mSource)
-
-      case 'toast':
-         return showToast(content, {
-            duration: extra ?? 5,
-            link: target ?? '',
-            classes: success ? 'toast-success' : 'toast-error',
-         })
-
-      case 'scroll':
-         const sDestination = document.querySelector(target)
-         if (null === sDestination) {
-            return
-         }
-         return sDestination.scrollIntoView({ behavior: 'smooth' })
-
-      default:
-         break
-   }
-   /**
-    * MULTIPLE TARGETS ACTIONS
-    */
-   document.querySelectorAll(target).forEach((el) => {
-      switch (action) {
-         case 'beforebegin':
-         case 'afterbegin':
-         case 'afterend':
-         case 'beforeend':
-            return el.insertAdjacentHTML(action, content)
-
-         case 'style':
+            navigator.clipboard.readText().then((subject) => {
+               el[content] = subject
+            })
+         },
+      },
+      reload: {
+         one: true,
+         cb: () =>
+            setTimeout(() => document.location.reload(), (extra ?? 5) * 1000),
+      },
+      remove: {
+         req: ['target'],
+         cb: (el) => el.remove(),
+      },
+      removeAttribute: {
+         req: ['target'],
+         cb: (el) => el.removeAttribute(content),
+      },
+      removeClass: {
+         req: ['target', 'content'],
+         cb: (el) => el.classList.remove(...content.split(' ')),
+      },
+      scroll: {
+         one: true,
+         req: ['target'],
+         cb: () => {
+            const destination = document.querySelector(target)
+            if (null !== destination) {
+               return destination.scrollIntoView({ behavior: 'smooth' })
+            }
+         },
+      },
+      session: {
+         one: true,
+         req: ['target'],
+         opt: ['content', 'extra'],
+         cb: () => doStorageAction(sessionStorage, target, content, extra),
+      },
+      setAttribute: {
+         req: ['target', 'content'],
+         cb: (el) => el.setAttribute(content, extra ?? 'true'),
+      },
+      show: {
+         req: ['target'],
+         cb: (el) => {
+            el.style.removeProperty('display')
+            el.classList.remove('d-none', 'hidden')
+         },
+      },
+      style: {
+         req: ['target', 'content'],
+         cb: (el) =>
             Object.entries(content).forEach(([key, value]) => {
                key = key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
                el.style.setProperty(key, value)
-            })
-            return
-
-         case 'text':
-            el.textContent = content
-            return
-
-         case 'html':
-            el.innerHTML = content
-            return
-
-         case 'show':
-            el.style.removeProperty('display')
-            return el.classList.remove('d-none', 'hidden')
-
-         case 'hide':
-            el.style.display = 'none'
-            return
-
-         case 'removeClass':
-            return el.classList.remove(...content.split(' '))
-
-         case 'addClass':
-            return el.classList.add(...content.split(' '))
-
-         case 'setAttribute':
-            return el.setAttribute(content, extra ?? 'true')
-
-         case 'removeAttribute':
-            return el.removeAttribute(content)
-
-         case 'paste':
-            return navigator.clipboard.readText().then((subject) => {
-               el[content] = subject
-            })
-
-         case 'value':
-            el.value = content
-            return
-
-         case 'remove':
-            return el.remove()
-
-         case 'trigger':
-            return el.dispatchEvent(
+            }),
+      },
+      text: {
+         req: ['target'],
+         cb: (el) => (el.textContent = content),
+      },
+      title: {
+         one: true,
+         req: ['content'],
+         cb: () => (document.title = content),
+      },
+      toast: {
+         one: true,
+         req: ['content'],
+         cb: () =>
+            showToast(content, {
+               duration: extra ?? 5,
+               link: target ?? '',
+               classes: success ? 'toast-success' : 'toast-error',
+            }),
+      },
+      trigger: {
+         req: ['target', 'content'],
+         cb: (el) =>
+            el.dispatchEvent(
                new Event(String(content), {
                   bubbles: false,
                   cancelable: true,
                })
-            )
+            ),
+      },
+      value: {
+         req: ['target', 'content'],
+         cb: (el) => (el.value = content),
+      },
+   }
 
-         case 'clone':
-            const source = document.querySelector(content)
-            if (null === source) {
-               return
-            }
+   // CHECKS action
+   if (empty(actions[action])) {
+      throw new Error(`${action} is not a valid action`)
+   }
 
-            return el.appendChild(source.cloneNode(true))
-
-         case 'method':
-            if ('function' === typeof el[content]) {
-               return el[content]()
-            }
-
-         default:
-            return
+   // CHECKS required proprieties
+   if (!empty(actions[action].req)) {
+      if (actions[action].req.some((check) => empty(todo[check]))) {
+         throw new Error(
+            `"${action}" needs ${actions[action].req.join(' and ')}`
+         )
       }
+   }
+
+   // CHECKS optional proprieties
+   if (!empty(actions[action].opt)) {
+      if (actions[action].opt.every((check) => empty(todo[check]))) {
+         throw new Error(
+            `"${action}" needs ${actions[action].opt.join(' or ')}`
+         )
+      }
+   }
+
+   // DO direct actions
+   if (!empty(actions[action].one)) {
+      return actions[action].cb()
+   }
+
+   // DO multiple target actions
+   return document.querySelectorAll(target).forEach((el) => {
+      return actions[action].cb(el)
    })
+}
+
+const doInsertAction = (el, action, content) =>
+   el.insertAdjacentHTML(action, content)
+
+const doStorageAction = (storage, target, content, extra) => {
+   target = target.replace(/[^a-zA-Z0-9_-]/g, '')
+   content = JSON.stringify(content)
+   extra = extra ?? 60 * 60 * 24 * 7
+
+   if (!empty(extra) && extra <= 0) {
+      return storage.removeItem(target)
+   }
+
+   if (storage === cookieStorage) {
+      return storage.setItem(target, content, extra)
+   } else {
+      return storage.setItem(target, content)
+   }
 }
 
 export const showToast = (message, options = {}) => {

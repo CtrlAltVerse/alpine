@@ -25,7 +25,7 @@
 </head>
 <body x-data="cav">
    <textarea id="targetInput" name="targetInput2" x-on:command="console.log('command')"
-      x-autosize>Input target dummy.</textarea>
+             x-autosize>Input target dummy.</textarea>
    <output class="targetOutput">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Optio, possimus officiis?
       <span style="display:none">hide Atque hic et labore eos voluptatum ipsum itaque magni tenetur facilis
          animi.</span>
@@ -46,13 +46,13 @@
       request</button>
 
    <button
-      x-on:click="console.log($do({action:'local', target:'cav-local', content:{check:'local',time: Date.now()}}))">set
+           x-on:click="console.log($do({action:'local', target:'cav-loc*al', content:{check:'local',time: Date.now()}}))">set
       local</button>
    <button
-      x-on:click="console.log($do({action:'session', target:'cav-session', content:{check:'session',time: Date.now()}}))">set
+           x-on:click="console.log($do({action:'session', target:'cav-ses*sion', content:{check:'session',time: Date.now()}}))">set
       session</button>
    <button
-      x-on:click="console.log($do({action:'cookie', target:'cav-cookie', content:{check:'cookie',time: Date.now()}}))">set
+           x-on:click="console.log($do({action:'cookie', target:'cav-cookie', content:{check:'cookie',time: Date.now()}}))">set
       cookie</button>
 
    <button x-on:click="console.log($do({action:'css', target:'.targetOutput', content:{backgroundColor:'red',fontSize: '2rem'
@@ -79,7 +79,7 @@
       HTML</button>
 
    <button
-      x-on:click="console.log($do({action:'html', target:'.targetOutput', content:`<b>${$width}x${$height}</b>`}))">Sets
+           x-on:click="console.log($do({action:'html', target:'.targetOutput', content:`<b>${$width}x${$height}</b>`}))">Sets
       HTML</button>
 
    <button x-on:click="console.log($do({action:'text', target:'.targetOutput', content:'<b>strong</b>'}))">Sets
@@ -101,10 +101,10 @@
    <button x-on:click="console.log($do({action:'title',content:'New Title'}))">Set title</button>
 
    <button x-on:click="console.log($do({action:'delay', content: {action:'remove',target:'#removal'}, extra: 7}))"
-      id="removal">Remove element with delay</button>
+           id="removal">Remove element with delay</button>
 
    <button
-      x-on:click="console.log($do({action:'addAttr',target:'#targetInput',content:'style', extra:'background-color:#234'}))">Add
+           x-on:click="console.log($do({action:'addAttr',target:'#targetInput',content:'style', extra:'background-color:#234'}))">Add
       attr</button>
 
    <button x-on:click="console.log($do({action:'clone',target:'.targetOutput',content:'#targetInput'}))">clones</button>
@@ -133,7 +133,7 @@
 
    <button x-on:click="newP">new p</button>
 
-   <template x-for="n in $range(7)">
+   <template x-for="n in $range('sierra','GOLF')">
       <span x-text="n"></span>
    </template>
 
