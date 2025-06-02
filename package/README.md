@@ -1,7 +1,7 @@
 # CAV Alpine Plugin
 
-A lightweight plugin (~8KB) with features to speed up the development of reactive websites, such as `$rest` and `$do`,
-slightly inspired by HTMX and jQuery.
+A lightweight plugin (~8KB) for Alpine.js v3 with features to speed up the development of reactive websites, such as
+`$rest` and `$do`, slightly inspired by HTMX and jQuery.
 
 ## Installation
 
@@ -10,9 +10,13 @@ slightly inspired by HTMX and jQuery.
 ```html
 <!-- CAV Alpine Plugin -->
 <script defer src="https://cdn.jsdelivr.net/npm/@ctrlaltvers/alpine@1/dist/cdn.min.js"></script>
+<!-- OR -->
+<script defer src="https://unpkg.com/@ctrlaltvers/alpine"></script>
 
 <!-- Alpine Core -->
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+<!-- OR -->
+<script defer src="https://unpkg.com/alpinejs"></script>
 ```
 
 ### Via NPM
@@ -62,7 +66,7 @@ element<sup><a href="#notes">4</a></sup>, according to the specified method. Acc
 ### $range
 
 ```ts
-$range(end: number | string, start = 1|'A'|'a'|'Alfa', step = 1): number[]
+$range(end: number | string, start = 1|'A'|'a'|'Alfa', step = 1): number[]|string[]
 ```
 
 Returns an array of numbers, letters or words from the NATO phonetic alphabet.
@@ -118,19 +122,6 @@ $do(action: enum|action[], target?: string, content?: any, extra?: number|string
 
 Do a single or an array of actions, as described below.
 
-#### Examples:
-
-```html
-<button x-on:click="$do('cookie', 'terms-accept', 'yes')">Accept</button>
-```
-
-```js
-$do([
-   { action: 'after', target: 'body', content: '<p id="newP">Lorem ipsum</p>' },
-   { action: 'setAttr', target: '#newP', content: 'class', extra: 'truncate' },
-])
-```
-
 | `action`                                         | `target`                                                                                                                             | `content`                                                                                   | `extra`                                                        |
 | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
 | `cookie`<br>Manages a cookie                     | Key<sup><a href="#notes">1</a></sup>.<br>_Required._                                                                                 | Value<sup><a href="#notes">2</a></sup>.<br>_Required._                                      | Expiration in seconds. If negative, deletes.<br>_Default: 7d._ |
@@ -165,6 +156,19 @@ $do([
 | `toast`<br>Shows a alert and returns its ID      | URL.<br>_Default: none._                                                                                                             | Toast text.<br>_Required._                                                                  | Duration in seconds.<br>_Default: 5s._                         |
 | `delay`<br>Delays one or a list of actions       |                                                                                                                                      | One or an array of actions.<br>_Required._                                                  | Delay in seconds.<br>_Default: 5s._                            |
 | `ignore`<br>Skips.                               |                                                                                                                                      |                                                                                             |                                                                |
+
+#### Examples:
+
+```html
+<button x-on:click="$do('cookie', 'terms-accept', 'yes')">Accept</button>
+```
+
+```js
+$do([
+   { action: 'after', target: 'body', content: '<p id="newP">Lorem ipsum</p>' },
+   { action: 'setAttr', target: '#newP', content: 'class', extra: 'truncate' },
+])
+```
 
 #### Toast list format
 
