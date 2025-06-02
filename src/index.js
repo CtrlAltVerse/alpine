@@ -1,25 +1,13 @@
+import { empty, hasValue } from './utils'
+
 export default function (Alpine) {
-   Alpine.magic('copy', () => {
-      if (location.protocol !== 'https:') {
-         return console.warn('Needs a https site.')
-      }
-
-      return (subject) => navigator.clipboard.writeText(subject)
-   })
-
-   Alpine.magic('action', (_el) => {
-      return (action, target = '', content = '', duration = 5) => {
+   Alpine.magic('do', (_el) => {
+      return (action, target = '', content = '', extra = null) => {
          if ('string' === typeof action) {
-            return doAction({ action, target, content, duration })
+            return doAction({ action, target, content, extra })
          }
 
-         if (Array.isArray(action)) {
-            action.forEach((act) => {
-               doAction(act)
-            })
-         } else {
-            doAction(action)
-         }
+         doActions(action)
       }
    })
 
@@ -37,10 +25,86 @@ export default function (Alpine) {
          patch: (path, body = {}) => {
             return doFetch(el, 'PATCH', path, body)
          },
-         delete: (path, body = {}) => {
+         del: (path, body = {}) => {
             return doFetch(el, 'DELETE', path, body)
          },
       }
+   })
+
+   Alpine.magic('width', () => {
+      return window.outerWidth
+   })
+
+   Alpine.magic('height', () => {
+      return window.outerHeight
+   })
+
+   Alpine.magic('get', () => {
+      const methods = {
+         cookie: (key) => {
+            return JSON.parse(cookieStorage.getItem(key))
+         },
+         local: (key) => {
+            return JSON.parse(localStorage.getItem(key))
+         },
+         session: (key) => {
+            return JSON.parse(sessionStorage.getItem(key))
+         },
+         value: (key) => {
+            let el = document.getElementsByName(key)
+            if (el.length) {
+               return el[0].value
+            }
+            el = document.getElementById(key)
+            if (null !== el) {
+               return el.value
+            }
+            el = document.querySelector(key)
+            if (null !== el) {
+               return el.value
+            }
+            return null
+         },
+         val: (key) => methods.value(key),
+         lcl: (key) => methods.local(key),
+         ses: (key) => methods.session(key),
+         ck: (key) => methods.cookie(key),
+      }
+
+      return methods
+   })
+
+   Alpine.magic('range', () => {
+      return function (start, stop, step = 1) {
+         if (empty(stop)) {
+            stop = start
+            start = start ? 1 : 0
+         }
+
+         const reverse = start > stop
+         if (reverse) {
+            start = stop
+            stop = start
+         }
+
+         const range = Array.from(
+            { length: (stop - start) / step + 1 },
+            (_, i) => start + i * step
+         )
+
+         return reverse ? range.reverse() : range
+      }
+   })
+
+   Alpine.directive('autosize', (el) => {
+      if ('TEXTAREA' !== el.tagName) {
+         return
+      }
+
+      el.addEventListener('input', () => {
+         el.style.height = 'auto'
+         el.style.height = `${el.scrollHeight}px`
+      })
    })
 }
 
@@ -59,7 +123,7 @@ async function doFetch(el, method, url, body = {}) {
       },
    }
 
-   if (objectIsEmpty(body) && el instanceof HTMLFormElement) {
+   if (empty(body) && el instanceof HTMLFormElement) {
       const formData = new FormData(el)
       formData.forEach(function (value, key) {
          if (typeof value === 'string') {
@@ -68,7 +132,7 @@ async function doFetch(el, method, url, body = {}) {
       })
    }
 
-   if (!objectIsEmpty(body)) {
+   if (!empty(body)) {
       if ('GET' === method) {
          url += '?' + new URLSearchParams(body)
       } else {
@@ -77,75 +141,119 @@ async function doFetch(el, method, url, body = {}) {
    }
 
    const res = await fetch(url, options)
-   const actions = await res.json()
-
+   const data = await res.json()
    const success = res.status < 400
 
-   if (Array.isArray(actions)) {
-      actions.forEach((action) => doAction(action, success))
-   } else {
-      doAction(actions, success)
-   }
+   const headers = {}
+   res.headers.forEach((value, key) => {
+      headers[key] = value
+   })
+
+   doActions(data, success, false)
+
    document.body.classList.remove('cav-body-loading')
    el.classList.remove('cav-el-loading')
 
-   return { success, data: actions }
+   return { success, status: res.status, data, headers }
 }
 
-const objectIsEmpty = (obj) => {
-   return Object.keys(obj).length === 0 && obj.constructor === Object
+const doActions = (actions, success = true, force = true) => {
+   if (Array.isArray(actions)) {
+      if (!force && empty(actions[0].action)) {
+         return
+      }
+
+      actions.forEach((action) => doAction(action, success))
+   } else {
+      if (!force && empty(actions.action)) {
+         return
+      }
+
+      doAction(actions, success)
+   }
 }
 
 const checkAction = (act, _success) => {
+   if ('ignore' === act.action) {
+      return act
+   }
+
    const alias = {
-      scrollTo: 'scroll',
+      addAttr: 'setAttribute',
       after: 'afterend',
-      before: 'beforebegin',
+      alert: 'toast',
       append: 'beforeend',
+      before: 'beforebegin',
+      css: 'style',
       prepend: 'afterbegin',
-      remClass: 'removeClass',
-      setAttr: 'setAttribute',
       remAttr: 'removeAttribute',
+      remClass: 'removeClass',
+      scrollTo: 'scroll',
+      setAttr: 'setAttribute',
    }
 
    act.action = alias[act.action] ?? act.action
 
    const required = {
       addClass: ['target', 'content'],
+      afterbegin: ['target'],
       afterend: ['target'],
-      beforeend: ['target'],
       beforebegin: ['target'],
-      cookie: ['target', 'content'],
+      beforeend: ['target'],
+      clone: ['target', 'content'],
+      cookie: ['target'],
+      copy: [],
       delay: ['content'],
-      go: ['content'],
+      go: ['target'],
       hide: ['target'],
       html: ['target'],
-      local: ['target', 'content'],
-      open: ['content'],
-      afterbegin: ['target'],
+      local: ['target'],
+      method: ['target'],
+      move: ['target', 'content'],
+      open: ['target'],
+      paste: ['target'],
       reload: [],
       remove: ['target'],
       removeAttribute: ['target'],
       removeClass: ['target', 'content'],
       scroll: ['target'],
-      session: ['target', 'content'],
+      session: ['target'],
       setAttribute: ['target', 'content'],
       show: ['target'],
+      style: ['target', 'content'],
       text: ['target'],
       title: ['content'],
       toast: ['content'],
       trigger: ['target', 'content'],
+      value: ['target', 'content'],
    }
 
-   if ('undefined' === required[act.action]) {
-      throw new Error('action invalid')
+   const optional = {
+      cookie: ['content', 'extra'],
+      copy: ['target', 'content'],
+      local: ['content', 'extra'],
+      session: ['content', 'extra'],
+   }
+
+   if (empty(required[act.action])) {
+      throw new Error(`${act.action} is not a valid action`)
    }
 
    required[act.action].forEach((check) => {
-      if ('undefined' === act[check]) {
-         throw new Error(`${check} needed`)
+      if (empty(act[check])) {
+         throw new Error(`${check} is needed for the "${act.action}" action`)
       }
    })
+
+   if (!empty(optional[act.action])) {
+      if (!optional[act.action].some((check) => !empty(act[check]))) {
+         throw new Error(
+            `${optional[act.action].join(' or ')} is needed for the "${
+               act.action
+            }" action`
+         )
+      }
+   }
 
    switch (act.action) {
       case 'cookie':
@@ -153,11 +261,43 @@ const checkAction = (act, _success) => {
       case 'local':
          act.target = act.target.replace(/[^a-zA-Z0-9_-]/g, '')
          act.content = JSON.stringify(act.content)
+         act.extra = act.extra ?? 60 * 60 * 24 * 7
          break
 
       case 'go':
       case 'open':
-         act.content = new URL(act.content).href
+         act.target = new URL(act.target).href
+         break
+
+      case 'toast':
+         if (!empty(act.target)) {
+            act.target = new URL(act.target).href
+         }
+         break
+
+      case 'copy':
+         if (!empty(act.target)) {
+            const el = document.querySelector(act.target)
+            if (el !== null) {
+               if (hasValue(el)) {
+                  act.content = el.value
+               } else {
+                  act.content = el.innerText
+               }
+            }
+         }
+         break
+
+      case 'paste':
+         const el = document.querySelector(act.target)
+         if (el !== null && empty(act.content)) {
+            if (hasValue(el)) {
+               act.content = 'value'
+            } else {
+               act.content = 'textContent'
+            }
+         }
+         break
 
       default:
          break
@@ -166,100 +306,114 @@ const checkAction = (act, _success) => {
    return act
 }
 
-const doAction = (act, success = false) => {
-   if (!act.hasOwnProperty('action')) {
-      throw new Error('action needed')
+const doAction = (todo, success = true) => {
+   if ('object' !== typeof todo) {
+      throw new Error('action is not a object')
    }
 
-   if ('ignore' === act.action) {
+   if (!todo.hasOwnProperty('action')) {
+      throw new Error('action is missing')
+   }
+
+   const { action, target, content, extra } = checkAction(todo, success)
+
+   if ('ignore' === action) {
       return
    }
 
-   act = checkAction(act, success)
-
-   const content = act.content ?? ''
-
-   if ('string' !== typeof content) {
-      if ('delay' === act.action) {
-         setTimeout(() => {
-            if (Array.isArray(content)) {
-               content.forEach((action) => doAction(action))
-            } else {
-               doAction(content)
-            }
-         }, (act.duration ?? 5) * 1000)
-      }
+   if ('delay' === action) {
+      setTimeout(() => doActions(content), (extra ?? 5) * 1000)
       return
    }
 
    /**
     * DIRECT ACTIONS
     */
-   switch (act.action) {
+   switch (action) {
       case 'session':
-         if (typeof act?.duration !== 'undefined' && act?.duration < 0) {
-            return sessionStorage.removeItem(act.target)
-         } else {
-            return sessionStorage.setItem(act.target, act.content)
-         }
-
       case 'local':
-         if (typeof act?.duration !== 'undefined' && act?.duration < 0) {
-            return localStorage.removeItem(act.target)
-         } else {
-            return localStorage.setItem(act.target, act.content)
+      case 'cookie':
+         let storage = localStorage
+         if (action === 'session') {
+            storage = sessionStorage
+         }
+         if (action === 'cookie') {
+            storage = cookieStorage
          }
 
-      case 'cookie':
-         document.cookie = `${act.target}=${act.content};Max-Age=${
-            act.duration ?? 60 * 60 * 24 * 7
-         };Path=/;SameSite=Lax;Secure`
-         return
+         if (!empty(extra) && extra <= 0) {
+            return storage.removeItem(target)
+         } else {
+            if (action === 'cookie') {
+               return storage.setItem(target, content, extra)
+            } else {
+               return storage.setItem(target, content)
+            }
+         }
 
       case 'go':
-         setTimeout(
-            () => location.assign(act.content),
-            (act.duration ?? 5) * 1000
-         )
+         setTimeout(() => location.assign(target), (extra ?? 5) * 1000)
          return
 
       case 'open':
-         setTimeout(() => window.open(act.content), (act.duration ?? 5) * 1000)
+         setTimeout(() => window.open(target), (extra ?? 5) * 1000)
          return
 
       case 'reload':
-         setTimeout(
-            () => document.location.reload(),
-            (act.duration ?? 5) * 1000
-         )
+         setTimeout(() => document.location.reload(), (extra ?? 5) * 1000)
          return
 
       case 'title':
          document.title = content
          return
 
+      case 'copy':
+         return navigator.clipboard.writeText(content)
+
+      case 'move':
+         const mSource = document.querySelector(content)
+         const mDestination = document.querySelector(target)
+
+         if (null === mSource || null === mDestination) {
+            return
+         }
+
+         return mDestination.appendChild(mSource)
+
       case 'toast':
-         return showToast(content, { duration: act.duration ?? 5 })
+         return showToast(content, {
+            duration: extra ?? 5,
+            link: target ?? '',
+            classes: success ? 'toast-success' : 'toast-error',
+         })
 
       case 'scroll':
-         return document
-            .querySelector(act.target)
-            .scrollIntoView({ behavior: 'smooth' })
+         const sDestination = document.querySelector(target)
+         if (null === sDestination) {
+            return
+         }
+         return sDestination.scrollIntoView({ behavior: 'smooth' })
 
       default:
          break
    }
-
    /**
     * MULTIPLE TARGETS ACTIONS
     */
-   document.querySelectorAll(act.target).forEach((el) => {
-      switch (act.action) {
+   document.querySelectorAll(target).forEach((el) => {
+      switch (action) {
          case 'beforebegin':
          case 'afterbegin':
          case 'afterend':
          case 'beforeend':
-            return el.insertAdjacentHTML(act.action, content)
+            return el.insertAdjacentHTML(action, content)
+
+         case 'style':
+            Object.entries(content).forEach(([key, value]) => {
+               key = key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
+               el.style.setProperty(key, value)
+            })
+            return
 
          case 'text':
             el.textContent = content
@@ -270,10 +424,12 @@ const doAction = (act, success = false) => {
             return
 
          case 'show':
+            el.style.removeProperty('display')
             return el.classList.remove('d-none', 'hidden')
 
          case 'hide':
-            return el.classList.add('d-none', 'hidden')
+            el.style.display = 'none'
+            return
 
          case 'removeClass':
             return el.classList.remove(...content.split(' '))
@@ -282,11 +438,19 @@ const doAction = (act, success = false) => {
             return el.classList.add(...content.split(' '))
 
          case 'setAttribute':
-            const [key, value] = content.split('=')
-            return el.setAttribute(key, value ?? 'true')
+            return el.setAttribute(content, extra ?? 'true')
 
          case 'removeAttribute':
             return el.removeAttribute(content)
+
+         case 'paste':
+            return navigator.clipboard.readText().then((subject) => {
+               el[content] = subject
+            })
+
+         case 'value':
+            el.value = content
+            return
 
          case 'remove':
             return el.remove()
@@ -298,6 +462,19 @@ const doAction = (act, success = false) => {
                   cancelable: true,
                })
             )
+
+         case 'clone':
+            const source = document.querySelector(content)
+            if (null === source) {
+               return
+            }
+
+            return el.appendChild(source.cloneNode(true))
+
+         case 'method':
+            if ('function' === typeof el[content]) {
+               return el[content]()
+            }
 
          default:
             return
@@ -314,7 +491,7 @@ export const showToast = (message, options = {}) => {
       list.id = 'toast-list'
       document.body.appendChild(list)
    }
-
+   const index = document.querySelectorAll('.toast').length
    const toast = document.createElement('li')
    toast.role = 'alert'
 
@@ -322,13 +499,13 @@ export const showToast = (message, options = {}) => {
       'toast',
       'toast-hidden',
       classes ?? 'toast-success',
-      'toast-index-' + document.querySelectorAll('.toast').length,
+      'toast-id-' + index,
    ]
    toast.className = allClasses.join(' ')
 
    const text = document.createTextNode(message)
 
-   if (link) {
+   if (link && link.length) {
       const hyperlink = document.createElement('a')
       hyperlink.href = link
       hyperlink.target = '_blank'
@@ -355,4 +532,27 @@ export const showToast = (message, options = {}) => {
          document.body.removeChild(list)
       }
    }, (duration ?? 5) * 1000 + 501)
+
+   return index
+}
+
+export const cookieStorage = {
+   getItem(key) {
+      let cookies = document.cookie.split(';')
+      for (let i = 0; i < cookies.length; i++) {
+         let cookie = cookies[i].split('=')
+         if (key == cookie[0].trim()) {
+            return decodeURIComponent(cookie[1])
+         }
+      }
+      return null
+   },
+   setItem(key, value, expiration = 60 * 60 * 24 * 7) {
+      document.cookie = `${key}=${encodeURIComponent(
+         value
+      )};max-age=${expiration};path=/`
+   },
+   removeItem(key) {
+      this.setItem(key, null, -999)
+   },
 }

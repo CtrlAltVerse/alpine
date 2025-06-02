@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Test cav plugin</title>
+   <script defer src="./dist/cdn.min.js"></script>
+   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.js"></script>
+   <style>
+      body {
+         display: flex;
+         flex-direction: column;
+         align-items: start;
+         gap: 1rem;
+         background-color: #333;
+         color: #ccc
+      }
+
+      * {
+         font-size: inherit;
+         background-color: inherit;
+         color: inherit;
+      }
+   </style>
+</head>
+<body x-data="cav">
+   <textarea id="targetInput" name="targetInput2" x-on:command="console.log('command')"
+      x-autosize>Input target dummy.</textarea>
+   <output class="targetOutput">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Optio, possimus officiis?
+      <span style="display:none">hide Atque hic et labore eos voluptatum ipsum itaque magni tenetur facilis
+         animi.</span>
+      Impedit id nesciunt iure ipsum, sequi fugiat</output>
+   <div class="targetOutput">empty</div>
+
+   <button x-on:click="console.log($do(['']))">not a object (error)</button>
+
+   <button x-on:click="console.log($do([{}]))">missing action (error)</button>
+
+   <button x-on:click="console.log($do({action:'xxx'}))">Invalid action (error)</button>
+
+   <button x-on:click="console.log($do({action:'local'}))">Set local (error)</button>
+
+   <button x-on:click="console.log($do({action:'reload'}))">Reload the page</button>
+
+   <button x-on:click="console.log(await $rest.get('https://jsonplaceholder.typicode.com/todos'))">do
+      request</button>
+
+   <button
+      x-on:click="console.log($do({action:'local', target:'cav-local', content:{check:'local',time: Date.now()}}))">set
+      local</button>
+   <button
+      x-on:click="console.log($do({action:'session', target:'cav-session', content:{check:'session',time: Date.now()}}))">set
+      session</button>
+   <button
+      x-on:click="console.log($do({action:'cookie', target:'cav-cookie', content:{check:'cookie',time: Date.now()}}))">set
+      cookie</button>
+
+   <button x-on:click="console.log($do({action:'css', target:'.targetOutput', content:{backgroundColor:'red',fontSize: '2rem'
+      }}))">css</button>
+
+   <button x-on:click="console.log($get.local('cav-local'))">get local</button>
+   <button x-on:click="console.log($get.session('cav-session'))">get session</button>
+   <button x-on:click="console.log($get.cookie('cav-cookie'))">get cookie</button>
+   <button x-on:click="console.log($get.val('targetInput'))">get value</button>
+
+   <button x-on:click="console.log($range(13))">get range</button>
+
+   <button x-on:click="console.log($do({action:'local', target:'cav-local', extra:-1}))">remove local</button>
+   <button x-on:click="console.log($do({action:'session', target:'cav-session', extra:-1}))">remove session</button>
+   <button x-on:click="console.log($do({action:'cookie', target:'cav-cookie', extra:-1}))">remove cookie</button>
+
+   <button x-on:click="console.log($do({action:'after', target:'.targetOutput', content:'<b>after</b>'}))">after
+      HTML</button>
+   <button x-on:click="console.log($do({action:'before', target:'.targetOutput', content:'<b>before</b>'}))">before
+      HTML</button>
+   <button x-on:click="console.log($do({action:'append', target:'.targetOutput', content:'<b>append</b>'}))">append
+      HTML</button>
+   <button x-on:click="console.log($do({action:'prepend', target:'.targetOutput', content:'<b>prepend</b>'}))">prepend
+      HTML</button>
+
+   <button
+      x-on:click="console.log($do({action:'html', target:'.targetOutput', content:`<b>${$width}x${$height}</b>`}))">Sets
+      HTML</button>
+
+   <button x-on:click="console.log($do({action:'text', target:'.targetOutput', content:'<b>strong</b>'}))">Sets
+      text</button>
+
+   <button x-on:click="console.log($do({action:'value', target:'.targetOutput', content:'new content'}))">sets
+      value</button>
+
+   <button x-on:click="console.log($do({action:'copy', target:'.targetOutput', content:'fallback'}))">Copy text</button>
+
+   <button x-on:click="console.log($do({action:'paste', target:'#targetInput'}))">Paste text</button>
+
+   <button x-on:click="console.log($do({action:'trigger', target:'#targetInput', content: 'command'}))">Trigger event
+      command</button>
+
+   <button x-on:click="console.log($do({action:'method', target:'#targetInput', content: 'focus'}))">Set focus
+      (method)</button>
+
+   <button x-on:click="console.log($do({action:'title',content:'New Title'}))">Set title</button>
+
+   <button x-on:click="console.log($do({action:'delay', content: {action:'remove',target:'#removal'}, extra: 7}))"
+      id="removal">Remove element with delay</button>
+
+   <button
+      x-on:click="console.log($do({action:'addAttr',target:'#targetInput',content:'style', extra:'background-color:#234'}))">Add
+      attr</button>
+
+   <button x-on:click="console.log($do({action:'clone',target:'.targetOutput',content:'#targetInput'}))">clones</button>
+
+   <button x-on:click="console.log($do({action:'move',target:'.targetOutput',content:'#targetInput'}))">moves</button>
+
+   <button x-on:click="console.log($do({action:'remAttr',target:'#targetInput',content:'style'}))">Remove attr</button>
+
+   <button x-on:click="console.log($do({action:'addClass',target:'#targetInput',content:'class1 class2'}))">Add
+      Class</button>
+
+   <button x-on:click="console.log($do({action:'remClass',target:'#targetInput',content:'class1 class2'}))">Rem
+      Class</button>
+
+   <button x-on:click="console.log($do({action:'hide',target:'#targetInput'}))">Hide</button>
+
+   <button x-on:click="console.log($do({action:'remove',target:'#targetInput'}))">Remove</button>
+
+   <button x-on:click="console.log($do({action:'show',target:'#targetInput'}))">Show</button>
+
+   <button x-on:click="console.log($do({action:'go', target:'/index.html?get=666', extra: 1}))">Go (error)</button>
+
+   <button x-on:click="console.log($do({action:'open', target:'https://x.com', extra: 1}))">Open</button>
+
+   <button x-on:click="console.log($do('toast', 'https://x.com', 'Toast content', 9))">Toast</button>
+
+   <button x-on:click="newP">new p</button>
+
+   <button x-on:click="console.log($do({action:'scroll',target:'#targetInput'}))">Scroll</button>
+
+   <script>
+      document.addEventListener('alpine:init', () => {
+         Alpine.data('cav', function () {
+            return {
+               newP: () => {
+                  this.$do([
+                     { action: 'after', target: 'body', content: '<p id="newP">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>' },
+                     { action: 'setAttr', target: '#newP', content: 'class', extra: 'truncate' }
+                  ])
+               }
+            }
+         })
+      })
+   </script>
+
+</body>
+</html>

@@ -1,5 +1,5 @@
-import cav, { showToast } from "../src/index.js";
+import cav, { showToast, cookieStorage } from '../src/index.js'
 
-export default cav;
+export default cav
 
-export { cav, showToast };
+export { cav, showToast, cookieStorage }
