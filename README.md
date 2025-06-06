@@ -1,5 +1,5 @@
 # CAV Alpine Plugin
 
-An Alpine 3 plugin with features to speed up the development of reactive websites.
+An Alpine.js v3 plugin for AJAX sites and reactive content.
 
-[Read all info here.](package/README.md)
+[Read the full documentation.](https://plugins.altvers.net/alpine)

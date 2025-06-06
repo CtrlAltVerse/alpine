@@ -4,28 +4,45 @@
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Test cav plugin</title>
-   <script defer src="./dist/cdn.min.js"></script>
-   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.js"></script>
-   <style>
-      body {
-         display: flex;
-         flex-direction: column;
-         align-items: start;
-         gap: 1rem;
-         background-color: #333;
-         color: #ccc
-      }
-
-      * {
-         font-size: inherit;
-         background-color: inherit;
-         color: inherit;
-      }
-   </style>
+   <script defer src="../package/dist/cdn.min.js"></script>
+   <script defer src="https://unpkg.com/alpinejs"></script>
+   <link rel="stylesheet" href="style.css">
 </head>
-<body x-data="cav">
+<body x-data="cav" class="bg-zinc-800 text-white">
+   <section class="flex flex-col gap-1">
+      <h2>x-countdown</h2>
+      <div x-countdown:13="newP">A new element will appears in %sec seconds.</div>
+      <div x-countdown.repeat.destroy="console.log('log')">trs</div>
+      <div x-countdown.invisible="console.log('still pings')"></div>
+   </section>
+   <hr>
+   <section class="flex flex-col gap-1">
+      <video src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"></video>
+      <button x-on:click="$do('pip')">PIP</button>
+   </section>
+   <hr>
+   <section class="flex flex-col gap-1">
+      <h2>$get</h2>
+      <span x-text="$get.cb">a</span>
+      <span x-on:click="console.log(await $get.cords())">c</span>
+   </section>
+   <hr>
+   <section class="flex flex-col gap-1">
+
+   </section>
+   <hr>
+   <section class="flex flex-col gap-1"></section>
+   <hr>
+   <section class="flex flex-col gap-1"></section>
+   <hr>
+   <section class="flex flex-col gap-1"></section>
+   <hr>
+   <section class="flex flex-col gap-1"></section>
+
+   <hr>
    <textarea id="targetInput" name="targetInput2" x-on:command="console.log('command')"
              x-autosize>Input target dummy.</textarea>
+
    <output class="targetOutput">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Optio, possimus officiis?
       <span style="display:none">hide Atque hic et labore eos voluptatum ipsum itaque magni tenetur facilis
          animi.</span>
@@ -62,8 +79,6 @@
    <button x-on:click="console.log($get.session('cav-session'))">get session</button>
    <button x-on:click="console.log($get.cookie('cav-cookie'))">get cookie</button>
    <button x-on:click="console.log($get.val('targetInput'))">get value</button>
-
-   <button x-on:click="console.log($range(13))">get range</button>
 
    <button x-on:click="console.log($do({action:'local', target:'cav-local', extra:-1}))">remove local</button>
    <button x-on:click="console.log($do({action:'session', target:'cav-session', extra:-1}))">remove session</button>
@@ -131,8 +146,6 @@
 
    <button x-on:click="console.log($do('toast', 'https://x.com', 'Toast content', 9))">Toast</button>
 
-   <button x-on:click="newP">new p</button>
-
    <template x-for="n in $range('sierra','GOLF')">
       <span x-text="n"></span>
    </template>
@@ -145,7 +158,7 @@
             return {
                newP: () => {
                   this.$do([
-                     { action: 'after', target: 'body', content: '<p id="newP">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>' },
+                     { action: 'prepend', target: 'body', content: '<p id="newP">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>' },
                      { action: 'setAttr', target: '#newP', content: 'class', extra: 'truncate' }
                   ])
                }

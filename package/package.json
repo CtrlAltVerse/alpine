@@ -2,7 +2,7 @@
    "name": "@ctrlaltvers/alpine",
    "author": "CtrlAltVerse (https://ctrl.altvers.net)",
    "description": "An Alpine plugin for reactive websites.",
-   "version": "1.0.1",
+   "version": "1.0.2",
    "homepage": "https://plugins.altvers.net/alpine",
    "keywords": [
       "alpinejs",
@@ -16,7 +16,7 @@
    "bugs": {
       "url": "https://github.com/CtrlAltVerse/alpine/issues"
    },
-   "license": "MIT",
+   "license": "GPLv3",
    "unpkg": "dist/cdn.min.js",
    "types": "dist/types.d.ts",
    "main": "dist/module.cjs.js",

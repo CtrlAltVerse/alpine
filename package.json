@@ -4,11 +4,19 @@
    "version": "1.0.0",
    "scripts": {
       "build": "node ./scripts/build.js",
-      "watch": "npm run build -- --watch",
-      "release": "node ./scripts/release.js"
+      "dev": "npm run build -- --watch",
+      "test": "npx @tailwindcss/cli -i ./tests/tailwind.css -o ./tests/style.css",
+      "docs:dev": "vitepress dev docs",
+      "docs:build": "vitepress build docs",
+      "docs:preview": "vitepress preview docs"
    },
    "devDependencies": {
+      "@ctrlaltvers/alpine": "file:package",
+      "@tailwindcss/cli": "^4.1.8",
       "@types/alpinejs": "^3.13.11",
-      "esbuild": ">=0.25.0"
-   }
+      "esbuild": ">=0.25.0",
+      "tailwindcss": "^4.1.8",
+      "vitepress": "^1.6.3"
+   },
+   "license": "GPLv3"
 }

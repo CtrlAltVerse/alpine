@@ -1,7 +1,7 @@
 let fs = require('fs')
 
 if (!fs.existsSync(`./package/dist`)) {
-   fs.mkdirSync(`./package/dist`, 0744)
+   fs.mkdirSync(`./package/dist`, 744)
 }
 
 fs.readdirSync(`./builds`).forEach((file) => {
@@ -61,17 +61,26 @@ function bundleFile(file) {
 }
 
 function build(options) {
+   const devMode = process.argv.includes('--watch')
+
    options.define || (options.define = {})
 
-   options.define['process.env.NODE_ENV'] = process.argv.includes('--watch')
+   options.define['process.env.NODE_ENV'] = devMode
       ? `'production'`
       : `'development'`
 
    return require('esbuild')
       .build({
-         logLevel: process.argv.includes('--watch') ? 'info' : 'warning',
-         watch: process.argv.includes('--watch'),
+         logLevel: devMode ? 'info' : 'warning',
+         plugins: devMode ? [watchPlugin()] : [],
          ...options,
       })
       .catch(() => process.exit(1))
+}
+
+function watchPlugin() {
+   return {
+      name: 'watch-plugin',
+      setup() {},
+   }
 }

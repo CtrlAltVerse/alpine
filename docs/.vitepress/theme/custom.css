@@ -1,0 +1,17 @@
+:root {
+   --vp-sidebar-width: 210px;
+}
+
+.aside {
+   width: 210px !important;
+}
+
+.VPDoc.has-aside .content-container {
+   max-width: 768px !important;
+}
+
+.vp-doc table {
+   --table-margin: -85px;
+   margin-right: var(--table-margin);
+   margin-left: var(--table-margin);
+}
