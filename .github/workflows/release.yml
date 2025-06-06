@@ -20,11 +20,16 @@ jobs:
           node-version: 22.1.0
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Building
+      - name: Building & Releasing
         run: |
           npm i
           npm run build
           npm run docs:build
+          chmod -R 755 ./package/
+          cd package
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Setup Rclone
         run: |
@@ -41,13 +46,6 @@ jobs:
           chmod 600 ~/.private_key
           rclone config create remote sftp host=${{ secrets.FTP_HOST }} user=${{ vars.SERVER_USER }} key_file=~/.private_key -v
           rclone sync ./docs/.vitepress/dist remote:${{ vars.SERVER_FOLDER }} -v
-
-      - name: Releasing
-        run: |
-          cd package
-          npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Send Email
         uses: hilarion5/send-mail@v1
