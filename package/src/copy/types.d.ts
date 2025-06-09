@@ -63,8 +63,15 @@ interface cavAction {
    extra?: number | string
 }
 
-interface cavRestBody {
-   [key: string]: string
+interface cavBasicObj {
+   [key: string | number]: string | number
+}
+
+interface cavRestResponse {
+   success: boolean
+   status: number
+   data: any
+   headers: cavBasicObj
 }
 
 interface $do {
@@ -76,12 +83,18 @@ interface $do {
    ): void
 }
 
+type $range = (
+   stop: number | string,
+   start?: number | string,
+   step?: number
+) => number[] | string[]
+
 interface $rest {
-   get(path: string, body?: cavRestBody): Promise<any>
-   post(path: string, body?: cavRestBody): Promise<any>
-   put(path: string, body?: cavRestBody): Promise<any>
-   patch(path: string, body?: cavRestBody): Promise<any>
-   del(path: string, body?: cavRestBody): Promise<any>
+   get(path: string, body?: cavBasicObj): Promise<cavRestResponse>
+   post(path: string, body?: cavBasicObj): Promise<cavRestResponse>
+   put(path: string, body?: cavBasicObj): Promise<cavRestResponse>
+   patch(path: string, body?: cavBasicObj): Promise<cavRestResponse>
+   del(path: string, body?: cavBasicObj): Promise<cavRestResponse>
 }
 
 interface $get {
@@ -89,6 +102,13 @@ interface $get {
    local(key: string): any
    session(key: string): any
    val(name: string): string
+}
+
+interface $is {
+   adblock(): Promise<boolean>
+   mobile(userAgent?: string): boolean
+   bot(userAgent?: string): boolean
+   touch(): boolean
 }
 
 /*
@@ -110,18 +130,20 @@ interface cookieStorage {
 declare module 'alpinejs' {
    interface Alpine {
       $do: $do
-      $rest: $rest
       $get: $get
-      $width: number
       $height: number
-      $range: number[]
+      $is: $is
+      $range: $range
+      $rest: $rest
+      $width: number
    }
    interface Magics<T> {
       $do: $do
-      $rest: $rest
       $get: $get
-      $width: number
       $height: number
-      $range: number[]
+      $is: $is
+      $range: $range
+      $rest: $rest
+      $width: number
    }
 }

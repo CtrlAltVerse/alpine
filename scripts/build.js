@@ -8,10 +8,13 @@ fs.readdirSync(`./builds`).forEach((file) => {
    bundleFile(file)
 })
 
-fs.copyFile('./package/src/types.d.ts', './package/dist/types.d.ts', (err) => {
-   if (err) {
-      throw err
-   }
+const toCopyFolder = './package/src/copy'
+fs.readdirSync(toCopyFolder).forEach((file) => {
+   fs.copyFile(toCopyFolder + '/' + file, './package/dist/' + file, (err) => {
+      if (err) {
+         throw err
+      }
+   })
 })
 
 function bundleFile(file) {

@@ -17,11 +17,6 @@
    </section>
    <hr>
    <section class="flex flex-col gap-1">
-      <video src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"></video>
-      <button x-on:click="$do('pip')">PIP</button>
-   </section>
-   <hr>
-   <section class="flex flex-col gap-1">
       <h2>$get</h2>
       <span x-text="$get.cb">a</span>
       <span x-on:click="console.log(await $get.cords())">c</span>
@@ -31,7 +26,13 @@
 
    </section>
    <hr>
-   <section class="flex flex-col gap-1"></section>
+   <section class="flex flex-col gap-1">
+      <h2>$is</h2>
+      <p>$is.adblock: <span x-text="$is.adblock"></span></p>
+      <p>$is.mobile: <span x-text="$is.mobile"></span></p>
+      <p>$is.bot: <span x-text="$is.bot"></span></p>
+      <p>$is.touch: <span x-text="$is.touch"></span></p>
+   </section>
    <hr>
    <section class="flex flex-col gap-1"></section>
    <hr>
@@ -151,6 +152,12 @@
    </template>
 
    <button x-on:click="console.log($do({action:'scroll',target:'#targetInput'}))">Scroll</button>
+
+   <hr>
+   <section class="flex flex-col gap-1">
+      <video src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" controls></video>
+      <button x-on:click="$do('pip')">PIP</button>
+   </section>
 
    <script>
       document.addEventListener('alpine:init', () => {

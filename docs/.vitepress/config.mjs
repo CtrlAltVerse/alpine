@@ -24,6 +24,7 @@ const magics = {
    items: [
       { text: '$do', link: '/magics/$do' },
       { text: '$get', link: '/magics/$get' },
+      { text: '$is', link: '/magics/$is' },
       { text: '$range', link: '/magics/$range' },
       { text: '$rest', link: '/magics/$rest' },
       { text: 'Others', link: '/magics/others' },
@@ -40,6 +41,8 @@ export default defineConfig({
    title: 'CAV Alpine Plugin',
    description: 'The easiest way to build AJAX sites and others features',
    themeConfig: {
+      head: [['link', { rel: 'icon', href: '/alpine/favicon.ico' }]],
+
       nav: [...initial, directives, magics, elements],
 
       socialLinks: [

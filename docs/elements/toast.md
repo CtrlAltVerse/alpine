@@ -3,7 +3,7 @@
 The action `toast` creates an alert inside a list that requires styling.
 
 ```js
-const toastIndex = $do('toast', 'Link', 'Text', 10)
+const toastID = $do('toast', 'Link', 'Text', 10)
 ```
 
 ## DOM Structure

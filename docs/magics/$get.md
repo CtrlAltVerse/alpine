@@ -1,7 +1,7 @@
 # $get
 
 ```ts
-$get.METHOD‎(key?: string): any
+$get.METHOD‎(key?: string): any | Promise<any>
 ```
 
 Gets the value of a storage item or element according to the specified method:
@@ -16,7 +16,7 @@ Gets the value of a storage item or element according to the specified method:
 `val` searches for the first element by name, ID, or CSS selector. Works with `input`, `output`, `select`,
 `button`,`option`, or `textarea`.
 
-`cb` and `cords` don't needs a key. Both returns promises, so await is needed is some contexts.
+`cb` and `cords` don't needs a key. Both returns promises, so `await` is required is some contexts.
 
 Returns `null` if the item is not found.
 

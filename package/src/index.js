@@ -3,6 +3,7 @@ import countdown from './directives/x-countdown'
 
 import $do from './magics/$do'
 import $get from './magics/$get'
+import $is from './magics/$is'
 import $range from './magics/$range'
 import $rest from './magics/$rest'
 
@@ -14,6 +15,8 @@ export default function (Alpine) {
    Alpine.magic('do', $do)
 
    Alpine.magic('get', $get)
+
+   Alpine.magic('is', $is)
 
    Alpine.magic('range', $range)
 
