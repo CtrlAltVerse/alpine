@@ -41,8 +41,6 @@ const doAction = (todo, success = true) => {
       return
    }
 
-   console.log(todo)
-
    const alias = {
       addAttr: 'setAttribute',
       after: 'afterend',

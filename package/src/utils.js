@@ -54,3 +54,15 @@ export const inNatoAlphabet = (word, notFound = -1) => {
 
    return notFound
 }
+
+export const ping = (url) => {
+   return new Promise((resolve) => {
+      const img = new Image()
+      const start = new Date().getTime()
+      img.onload = () => resolve(new Date().getTime() - start)
+      img.onerror = () => resolve(false)
+      img.src = '//' + url + '/favicon.ico'
+
+      setTimeout(() => resolve(false), 999)
+   })
+}
