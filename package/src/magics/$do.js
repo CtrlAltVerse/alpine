@@ -201,6 +201,28 @@ const doAction = (todo, success = true) => {
          req: ['target', 'content'],
          cb: (el) => el.classList.remove(...content.split(' ')),
       },
+      script: {
+         one: true,
+         cb: () =>
+            new Promise((resolve) => {
+               if (null !== document.getElementById(`${target}-js`)) {
+                  resolve(true)
+                  return
+               }
+               const script = document.createElement('script')
+               script.id = `${target}-js`
+               script.src = content
+               script.onload = () => setTimeout(() => resolve(true), 33)
+               script.onerror = () => resolve(false)
+               if (empty(extra)) {
+                  extra = { async: '' }
+               }
+               for (const [key, value] of Object.entries(extra)) {
+                  script.setAttribute(key, value ?? '')
+               }
+               document.head.appendChild(script)
+            }),
+      },
       scroll: {
          one: true,
          req: ['target'],

@@ -4,7 +4,7 @@
    "version": "1.0.0",
    "scripts": {
       "build": "node ./scripts/build.js",
-      "dev": "npm run build -- --watch",
+      "dev": "nodemon",
       "test": "npx @tailwindcss/cli -i ./tests/tailwind.css -o ./tests/style.css",
       "docs:dev": "vitepress dev docs",
       "docs:build": "vitepress build docs",
@@ -15,8 +15,9 @@
       "@tailwindcss/cli": "^4.1.8",
       "@types/alpinejs": "^3.13.11",
       "esbuild": ">=0.25.0",
+      "nodemon": "^3.1.10",
       "tailwindcss": "^4.1.8",
       "vitepress": "^1.6.3"
    },
-   "license": "GPLv3"
+   "license": "GPL-3.0-or-later"
 }

@@ -38,6 +38,7 @@ type cavActionName =
    | 'removeAttribute'
    | 'removeClass'
    | 'scroll'
+   | 'script'
    | 'session'
    | 'setAttribute'
    | 'show'
@@ -80,7 +81,7 @@ interface $do {
       target?: string,
       content?: any,
       extra?: number | string
-   ): void
+   ): any | Promise<boolean>
 }
 
 type $range = (

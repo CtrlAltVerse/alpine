@@ -163,6 +163,16 @@
       document.addEventListener('alpine:init', () => {
          Alpine.data('cav', function () {
             return {
+               init: () => {
+                  this.$do(
+         'script',
+         'youtube',
+         'https://www.youtube.com/iframe_api',
+         {
+            async: '',
+         }
+      ).then((ok) => {console.log(YT)})},
+
                newP: () => {
                   this.$do([
                      { action: 'prepend', target: 'body', content: '<p id="newP">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>' },

@@ -1,4 +1,8 @@
 export const empty = (variable) => {
+   if (null === variable) {
+      return true
+   }
+
    if ('object' === typeof variable && variable.constructor === Object) {
       return Object.keys(variable).length === 0
    }

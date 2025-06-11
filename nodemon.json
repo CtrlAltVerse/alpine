@@ -1,0 +1,6 @@
+{
+   "verbose": false,
+   "watch": ["./package/src/"],
+   "exec": "npm run build",
+   "ext": "*.js"
+}
