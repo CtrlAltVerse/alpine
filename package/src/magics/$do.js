@@ -87,7 +87,11 @@ const doAction = (todo, success = true) => {
          one: true,
          same: true,
          req: ['target'],
-         cb: () => Function(target.slice(0, 22)),
+         cb: () => {
+            if (target.length <= 22) {
+               return Function(target)
+            }
+         },
       },
       clone: {
          req: ['target', 'content'],

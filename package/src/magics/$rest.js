@@ -5,18 +5,16 @@ const $rest = (el) => {
    return Object.fromEntries(
       ['get', 'post', 'put', 'patch', 'del', 'delete'].map((method) => [
          method,
-         (path, body = {}) => {
-            document.startViewTransition(() => doFetch(el, method, path, body))
+         async (path, body = {}) => {
+            if (!document.body.classList.contains('cav-body-loading')) {
+               return doFetch(el, method, path, body)
+            }
          },
       ])
    )
 }
 
 async function doFetch(el, method, url, body = {}) {
-   if (document.body.classList.contains('cav-body-loading')) {
-      return
-   }
-
    document.body.classList.add('cav-body-loading')
    el.classList.add('cav-el-loading')
 
@@ -46,21 +44,35 @@ async function doFetch(el, method, url, body = {}) {
       }
    }
 
-   const res = await fetch(url, options)
-   const data = await res.json()
-   const success = data?.success ?? res.status < 400
+   let response
+   let transition
+   const _doFetch = async () => {
+      const res = await fetch(url, options)
+      const data = await res.json()
 
-   const headers = {}
-   res.headers.forEach((value, key) => {
-      headers[key] = value
-   })
+      const success = data?.success ?? res.status < 400
 
-   doActions(data?.data ?? data, success, false)
+      const headers = {}
+      res.headers.forEach((value, key) => {
+         headers[key] = value
+      })
 
-   document.body.classList.remove('cav-body-loading')
-   el.classList.remove('cav-el-loading')
+      doActions(data?.data ?? data, success, false)
 
-   return { success, status: res.status, data, headers }
+      document.body.classList.remove('cav-body-loading')
+      el.classList.remove('cav-el-loading')
+
+      response = { success, status: res.status, data, headers }
+   }
+
+   if (document.startViewTransition) {
+      transition = document.startViewTransition(() => _doFetch())
+      await transition.updateCallbackDone
+   } else {
+      await _doFetch()
+   }
+
+   return { ...response, transition }
 }
 
 export default $rest
