@@ -5,7 +5,9 @@ const $rest = (el) => {
    return Object.fromEntries(
       ['get', 'post', 'put', 'patch', 'del', 'delete'].map((method) => [
          method,
-         (path, body = {}) => doFetch(el, method, path, body),
+         (path, body = {}) => {
+            document.startViewTransition(() => doFetch(el, method, path, body))
+         },
       ])
    )
 }

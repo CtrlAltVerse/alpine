@@ -1,6 +1,6 @@
-import { empty } from '../utils'
+import { empty, cookieStorage } from '../utils'
 
-const $do = (_el) => {
+const $do = (_el, { evaluate }) => {
    return (action, target = '', content = '', extra = null) => {
       if ('string' === typeof action) {
          return doAction({ action, target, content, extra })
@@ -47,6 +47,7 @@ const doAction = (todo, success = true) => {
       alert: 'toast',
       append: 'beforeend',
       before: 'beforebegin',
+      cb: 'callback',
       css: 'style',
       prepend: 'afterbegin',
       remAttr: 'removeAttribute',
@@ -63,20 +64,30 @@ const doAction = (todo, success = true) => {
          cb: (el) => el.classList.add(...content.split(' ')),
       },
       afterbegin: {
+         same: true,
          req: ['target'],
          cb: (el) => doInsertAction(el, action, content),
       },
       afterend: {
+         same: true,
          req: ['target'],
          cb: (el) => doInsertAction(el, action, content),
       },
       beforebegin: {
+         same: true,
          req: ['target'],
          cb: (el) => doInsertAction(el, action, content),
       },
       beforeend: {
+         same: true,
          req: ['target'],
          cb: (el) => doInsertAction(el, action, content),
+      },
+      callback: {
+         one: true,
+         same: true,
+         req: ['target'],
+         cb: () => Function(target.slice(0, 22)),
       },
       clone: {
          req: ['target', 'content'],
@@ -127,6 +138,7 @@ const doAction = (todo, success = true) => {
          cb: (el) => (el.style.display = 'none'),
       },
       html: {
+         same: true,
          req: ['target'],
          opt: ['content', 'extra'],
          cb: (el) => (el.innerHTML = content),
@@ -203,6 +215,7 @@ const doAction = (todo, success = true) => {
       },
       script: {
          one: true,
+         same: true,
          cb: () =>
             new Promise((resolve) => {
                if (null !== document.getElementById(`${target}-js`)) {
@@ -212,7 +225,7 @@ const doAction = (todo, success = true) => {
                const script = document.createElement('script')
                script.id = `${target}-js`
                script.src = content
-               script.onload = () => setTimeout(() => resolve(true), 33)
+               script.onload = () => setTimeout(() => resolve(true), 99)
                script.onerror = () => resolve(false)
                if (empty(extra)) {
                   extra = { async: '' }
@@ -339,11 +352,7 @@ const doStorageAction = (storage, target, content, extra) => {
       return storage.removeItem(target)
    }
 
-   if (storage === cookieStorage) {
-      return storage.setItem(target, content, extra)
-   } else {
-      return storage.setItem(target, content)
-   }
+   return storage.setItem(...[target, content, extra])
 }
 
 const doToastAction = (message, options = {}) => {

@@ -11,8 +11,8 @@ interface $RestResponse {
 }
 ```
 
-Makes an HTTP request. Both the payload and response must be in JSON format. The available methods are `get`, `post`,
-`put`, `patch` and `del`.
+Makes an HTTP request and started a View Transition. Both the payload and response must be in JSON format. The
+available methods are `get`, `post`, `put`, `patch` and `del`.
 
 If the response is an array of actions ([see $do](/magics/$do)), executes them.
 
