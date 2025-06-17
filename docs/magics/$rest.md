@@ -8,6 +8,7 @@ interface $RestResponse {
    status: number // statusCode
    data: any // body, usually action[].
    headers: object // headers
+   transition: ViewTransition | null
 }
 ```
 

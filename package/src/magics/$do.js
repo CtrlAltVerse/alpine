@@ -89,7 +89,7 @@ const doAction = (todo, success = true) => {
          req: ['target'],
          cb: () => {
             if (target.length <= 22) {
-               return Function(target)
+               return Function(target)()
             }
          },
       },

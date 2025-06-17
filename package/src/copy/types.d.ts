@@ -73,6 +73,7 @@ interface cavRestResponse {
    status: number
    data: any
    headers: cavBasicObj
+   transition: ViewTransition | null
 }
 
 interface $do {
