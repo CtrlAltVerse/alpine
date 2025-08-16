@@ -30,7 +30,7 @@ async function doFetch(el, method, url, body = {}) {
    if (empty(body) && el instanceof HTMLFormElement) {
       const formData = new FormData(el)
       formData.forEach(function (value, key) {
-         if (typeof value === 'string') {
+         if (typeof value === 'string' && value !== '') {
             body[key] = value
          }
       })

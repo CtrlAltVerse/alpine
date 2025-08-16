@@ -26,7 +26,7 @@ export const doActions = (actions, success = true, force = true) => {
    }
 }
 
-const doAction = (todo, success = true) => {
+export const doAction = (todo, success = true) => {
    if ('object' !== typeof todo) {
       throw new Error('action is not a object')
    }
@@ -361,11 +361,13 @@ const doStorageAction = (storage, target, content, extra) => {
 
 const doToastAction = (message, options = {}) => {
    const { duration, classes, link } = options
+   const durationMS = (duration ?? 5) * 1000
 
    let list = document.getElementById('toasts')
    if (!list) {
       list = document.createElement('ul')
       list.id = 'toasts'
+      list.popover = 'manual'
       document.body.appendChild(list)
    }
    const index = document.querySelectorAll('.toast').length
@@ -380,6 +382,10 @@ const doToastAction = (message, options = {}) => {
    ]
    toast.className = allClasses.join(' ')
 
+   const bar = document.createElement('div')
+   bar.className = 'toast-bar'
+   bar.style = `transition-duration: ${durationMS}ms`
+
    const text = document.createTextNode(message)
 
    if (link && link.length) {
@@ -393,22 +399,25 @@ const doToastAction = (message, options = {}) => {
       toast.appendChild(text)
    }
 
+   toast.appendChild(bar)
+
    list.appendChild(toast)
 
    setTimeout(() => {
+      list.showPopover()
       toast.classList.remove('toast-hidden')
    }, 1)
 
    setTimeout(() => {
       toast.classList.add('toast-hidden')
-   }, (duration ?? 5) * 1000)
+   }, durationMS)
 
    setTimeout(() => {
       list.removeChild(toast)
       if (!document.querySelectorAll('.toast').length) {
          document.body.removeChild(list)
       }
-   }, (duration ?? 5) * 1000 + 501)
+   }, durationMS + 501)
 
    return index
 }

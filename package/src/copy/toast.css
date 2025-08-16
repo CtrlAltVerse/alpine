@@ -1,15 +1,26 @@
 #toasts {
-   @apply fixed right-0 bottom-0 z-50 flex flex-col-reverse gap-1 m-2 sm:max-w-96;
+   @apply flex flex-col-reverse gap-1 ml-auto mt-auto mb-2 mr-2 bg-transparent sm:max-w-96;
 }
 
 .toast {
-   @apply rounded py-3 px-4 bg-zinc-200 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 transition duration-100 ease-linear;
-}
+   @apply relative rounded py-3 px-4 bg-zinc-200 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 overflow-hidden transition duration-100 ease-linear;
 
-.toast.toast-error {
-   @apply text-red-600;
+   .toast-bar {
+      @apply absolute bottom-0 left-0 h-0.5 bg-zinc-100/60;
+      width: 0%;
+      transition-property: width;
+      transition-timing-function: linear;
+   }
 }
 
 .toast-hidden {
    @apply opacity-0 translate-y-full scale-50;
+
+   .toast-bar {
+      @apply w-full;
+   }
+}
+
+.toast.toast-error {
+   @apply text-red-600;
 }

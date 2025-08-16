@@ -22,6 +22,10 @@ const countdown = (
       updateText()
    })
 
+   if (modifiers.includes('start') && expression) {
+      evaluate(expression)
+   }
+
    const timer = setInterval(() => {
       countdown--
 

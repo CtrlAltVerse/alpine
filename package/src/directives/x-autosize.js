@@ -1,11 +1,23 @@
-const autosize = (el) => {
+const autosize = (el, {}, { cleanup }) => {
    if ('TEXTAREA' !== el.tagName) {
       return
    }
 
-   el.addEventListener('input', () => {
+   const onInput = () => {
+      if (!el.hasAttribute('rows')) {
+         el.rows = 1
+      }
       el.style.height = 'auto'
       el.style.height = `${el.scrollHeight}px`
+      el.style.resize = 'none'
+   }
+
+   el.addEventListener('input', onInput)
+   window.addEventListener('resize', onInput)
+   onInput()
+
+   cleanup(() => {
+      window.removeEventListener('resize', onInput)
    })
 }
 

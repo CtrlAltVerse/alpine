@@ -1,8 +1,8 @@
 {
    "name": "@ctrlaltvers/alpine",
-   "author": "CtrlAltVerse (https://ctrl.altvers.net)",
+   "author": "CtrlAltVersœ (https://ctrl.altvers.net)",
    "description": "An Alpine plugin for reactive websites.",
-   "version": "1.0.8",
+   "version": "1.1.0",
    "homepage": "https://plugins.altvers.net/alpine",
    "keywords": [
       "alpinejs",
