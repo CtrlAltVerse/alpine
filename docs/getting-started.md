@@ -17,12 +17,12 @@
 ## Via NPM
 
 ```shell
-npm install @ctrtaltvers/alpine
+npm install @ctrlaltvers/alpine
 ```
 
 ```js
 import Alpine from 'alpinejs'
-import cav from '@ctrtaltvers/alpine'
+import cav from '@ctrlaltvers/alpine'
 
 Alpine.plugin(cav)
 ```

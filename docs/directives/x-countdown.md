@@ -15,12 +15,20 @@ If a value is provided to the attribute, it will be executed when the countdown 
 
 ## Modifiers
 
+### .start
+
+Executes the given value on initialization.
+
+```html
+<div x-countdown:15.start="console.log('Ping')">Another ping in %sec.</div>
+```
+
 ### .repeat
 
 When the countdown reaches zero, it restarts.
 
 ```html
-<div x-countdown:30.repeat="console.log('Ping')">New ping in %sec.</div>
+<div x-countdown:30.repeat="console.log('Ping')">Pings in %sec.</div>
 ```
 
 ### .invisible

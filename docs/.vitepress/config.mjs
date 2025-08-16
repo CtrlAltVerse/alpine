@@ -62,7 +62,7 @@ export default defineConfig({
       footer: {
          message: 'Released under the GPLv3 License.',
          copyright:
-            '<a href="https://ctrl.altvers.net" title="A project by CtrlAltVerse">🌌</a>',
+            '<a href="https://ctrl.altvers.net" title="A project by CtrlAltVersœ">🌌</a>',
       },
    },
    base: '/alpine/',
