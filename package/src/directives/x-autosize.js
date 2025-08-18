@@ -7,9 +7,9 @@ const autosize = (el, {}, { cleanup }) => {
       if (!el.hasAttribute('rows')) {
          el.rows = 1
       }
-      el.style.height = 'auto'
       el.style.height = `${el.scrollHeight}px`
       el.style.resize = 'none'
+      el.style.overflow = 'hidden'
    }
 
    el.addEventListener('input', onInput)
