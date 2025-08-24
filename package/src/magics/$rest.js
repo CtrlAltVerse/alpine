@@ -6,7 +6,10 @@ const $rest = (el) => {
       ['get', 'post', 'put', 'patch', 'del', 'delete'].map((method) => [
          method,
          async (path, body = {}) => {
-            if (!document.body.classList.contains('cav-body-loading')) {
+            if (
+               !document.body.classList.contains('cav-body-loading') ||
+               (el.dataset?.force ?? false)
+            ) {
                return doFetch(el, method, path, body)
             }
          },
@@ -22,6 +25,7 @@ async function doFetch(el, method, url, body = {}) {
 
    const options = {
       method,
+      cache: 'default',
       headers: {
          'Content-Type': 'application/json',
       },
@@ -65,7 +69,7 @@ async function doFetch(el, method, url, body = {}) {
       response = { success, status: res.status, data, headers }
    }
 
-   if (document.startViewTransition) {
+   if (document.startViewTransition && (!el.dataset?.skipTransition ?? false)) {
       transition = document.startViewTransition(() => _doFetch())
       await transition.updateCallbackDone
    } else {
