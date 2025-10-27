@@ -1,4 +1,4 @@
-import { empty, cookieStorage } from '../utils'
+import { empty, cookieStorage, hasValue } from '../utils'
 
 const $do = (_el, { evaluate }) => {
    return (action, target = '', content = '', extra = null) => {
