@@ -29,7 +29,7 @@ jobs:
           npm run docs:build
           chmod -R 755 ./package/
           cd package
-          npm publish
+          npm publish --access public --provenance
 
       - name: Setup Rclone
         run: |
