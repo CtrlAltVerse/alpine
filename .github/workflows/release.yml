@@ -28,8 +28,6 @@ jobs:
           chmod -R 755 ./package/
           cd package
           npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Setup Rclone
         run: |
@@ -47,14 +45,14 @@ jobs:
           rclone config create remote sftp host=${{ secrets.FTP_HOST }} user=${{ vars.SERVER_USER }} key_file=~/.private_key -v
           rclone sync ./docs/.vitepress/dist remote:${{ vars.SERVER_FOLDER }} -v
 
-      - name: Send Email
-        uses: hilarion5/send-mail@v1
-        with:
-          smtp-server: ${{vars.SMTP_HOST}}
-          from-email: ${{vars.SMTP_USER}}
-          to-email: para@fagnerjb.com
-          username: ${{vars.SMTP_USER}}
-          password: ${{secrets.SMTP_PASS}}
-          subject: Deploy done
-          html: |
-            <p>Deploy done: ${{github.ref_name}} in ${{github.repository}}</p>
+      # - name: Send Email
+      #   uses: hilarion5/send-mail@v1
+      #   with:
+      #     smtp-server: ${{vars.SMTP_HOST}}
+      #     from-email: ${{vars.SMTP_USER}}
+      #     to-email: para@fagnerjb.com
+      #     username: ${{vars.SMTP_USER}}
+      #     password: ${{secrets.SMTP_PASS}}
+      #     subject: Deploy done
+      #     html: |
+      #       <p>Deploy done: ${{github.ref_name}} in ${{github.repository}}</p>
