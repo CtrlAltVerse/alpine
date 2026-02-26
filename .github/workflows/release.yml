@@ -18,7 +18,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22.1.0
+          node-version: 24
           registry-url: 'https://registry.npmjs.org'
 
       - name: Building & Releasing
@@ -28,5 +28,3 @@ jobs:
           chmod -R 755 ./package/
           cd package
           npm publish
-        env:
-          NPM_CONFIG_PROVENANCE: true
