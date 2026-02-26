@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  deploy:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,4 +27,4 @@ jobs:
           npm run build
           chmod -R 755 ./package/
           cd package
-          npm publish
+          npm publish --provenance
