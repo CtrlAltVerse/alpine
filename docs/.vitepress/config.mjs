@@ -16,6 +16,8 @@ const directives = {
    items: [
       { text: 'x-autosize', link: '/directives/x-autosize' },
       { text: 'x-countdown', link: '/directives/x-countdown' },
+      { text: 'x-login', link: '/directives/x-login' },
+      { text: 'x-tip', link: '/directives/x-tip' },
    ],
 }
 
@@ -34,6 +36,7 @@ const magics = {
 const elements = {
    text: 'Elements',
    items: [{ text: 'Toast', link: '/elements/toast' }],
+   items: [{ text: 'Tooltip', link: '/elements/tip' }],
 }
 
 // https://vitepress.dev/reference/site-config

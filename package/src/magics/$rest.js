@@ -13,7 +13,7 @@ const $rest = (el) => {
                return doFetch(el, method, path, body)
             }
          },
-      ])
+      ]),
    )
 }
 
@@ -69,7 +69,7 @@ async function doFetch(el, method, url, body = {}) {
       response = { success, status: res.status, data, headers }
    }
 
-   if (document.startViewTransition && (!el.dataset?.skipTransition ?? false)) {
+   if (document.startViewTransition && !el.dataset.skipTransition) {
       transition = document.startViewTransition(() => _doFetch())
       await transition.updateCallbackDone
    } else {

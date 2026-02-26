@@ -1,6 +1,7 @@
 import autosize from './directives/x-autosize'
 import countdown from './directives/x-countdown'
 import login from './directives/x-login'
+import tip from './directives/x-tip'
 
 import $do from './magics/$do'
 import $get from './magics/$get'
@@ -14,6 +15,8 @@ export default function (Alpine) {
    Alpine.directive('countdown', countdown)
 
    Alpine.directive('login', login)
+
+   Alpine.directive('tip', tip)
 
    Alpine.magic('do', $do)
 
