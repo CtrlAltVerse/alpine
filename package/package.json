@@ -16,6 +16,10 @@
    "bugs": {
       "url": "https://github.com/CtrlAltVerse/alpine/issues"
    },
+   "publishConfig": {
+      "access": "public",
+      "provenance": true
+   },
    "license": "GPL-3.0-or-later",
    "unpkg": "dist/cdn.min.js",
    "types": "dist/types.d.ts",

@@ -27,4 +27,6 @@ jobs:
           npm run build
           chmod -R 755 ./package/
           cd package
-          npm publish --provenance
+          npm publish
+        env:
+          NPM_CONFIG_PROVENANCE: true
