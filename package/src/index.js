@@ -8,6 +8,7 @@ import $get from './magics/$get'
 import $is from './magics/$is'
 import $range from './magics/$range'
 import $rest from './magics/$rest'
+import $time from './magics/$time'
 
 export default function (Alpine) {
    Alpine.directive('autosize', autosize)
@@ -27,6 +28,8 @@ export default function (Alpine) {
    Alpine.magic('range', $range)
 
    Alpine.magic('rest', $rest)
+
+   Alpine.magic('time', $time)
 
    Alpine.magic('width', () => window.outerWidth)
 
