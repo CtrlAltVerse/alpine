@@ -2,8 +2,8 @@ const MINUTES_IN_SECONDS = 60
 const HOURS_IN_SECONDS = 60 * MINUTES_IN_SECONDS
 const DAYS_IN_SECONDS = 24 * HOURS_IN_SECONDS
 const WEEKS_IN_SECONDS = 7 * DAYS_IN_SECONDS
-const MONTHS_IN_SECONDS = 30 * DAYS_IN_SECONDS
-const YEARS_IN_SECONDS = 365 * DAYS_IN_SECONDS
+const MONTHS_IN_SECONDS = 30.4167 * DAYS_IN_SECONDS
+const YEARS_IN_SECONDS = 365.25 * DAYS_IN_SECONDS
 
 const $time = () => ({
    diff(from, to = 0) {
@@ -50,6 +50,54 @@ const $time = () => ({
          amount,
          metric,
       }
+   },
+
+   plus(from, amount, metric = 'days') {
+      if (typeof from === 'string') {
+         from = Date.parse(from)
+      }
+
+      switch (metric) {
+         case 'second':
+         case 'seconds':
+            amount = amount * 1000
+            break
+
+         case 'minute':
+         case 'minutes':
+            amount = amount * MINUTES_IN_SECONDS * 1000
+            break
+
+         case 'hour':
+         case 'hours':
+            amount = amount * HOURS_IN_SECONDS * 1000
+            break
+
+         case 'day':
+         case 'days':
+            amount = amount * DAYS_IN_SECONDS * 1000
+            break
+
+         case 'week':
+         case 'weeks':
+            amount = amount * WEEKS_IN_SECONDS * 1000
+            break
+
+         case 'month':
+         case 'months':
+            amount = amount * MONTHS_IN_SECONDS * 1000
+            break
+
+         case 'year':
+         case 'years':
+            amount = amount * YEARS_IN_SECONDS * 1000
+            break
+
+         default:
+            break
+      }
+
+      return from + amount
    },
 })
 
